@@ -22,6 +22,7 @@ import java.util.Map;
 
 import static de.seuhd.campuscoffee.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Step definitions for the POS Cucumber tests.
@@ -92,6 +93,10 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Given step for new scenario
+    @Given("the following POS exist")
+    public void theFollowingPosExist(List<PosDto> posList) {
+        createdPosList = createPos(posList);
+        assertThat(createdPosList).size().isEqualTo(posList.size());
 
     // When -----------------------------------------------------------------------
 
@@ -99,6 +104,14 @@ public class CucumberPosSteps {
     public void insertPosWithTheFollowingValues(List<PosDto> posList) {
         createdPosList = createPos(posList);
         assertThat(createdPosList).size().isEqualTo(posList.size());
+    }
+
+    @When("I update the POS with name {string} to have description {string}")
+    public void iUpdateThePosWithNameStringToHaveDescriptionString(String name, String newDescription) {
+        // Logic to update the POS description based on the name
+        PosDto posToUpdate = posService.findByName(name);
+        posToUpdate.setDescription(newDescription);
+        posService.update(posToUpdate);
     }
 
     // TODO: Add When step for new scenario
@@ -111,6 +124,12 @@ public class CucumberPosSteps {
         assertThat(retrievedPosList)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "createdAt", "updatedAt")
                 .containsExactlyInAnyOrderElementsOf(createdPosList);
+    }
+
+    @Then("the POS with name {string} should have description {string}")
+    public void verifyPosDescription(String name, String expectedDescription) {
+        PosDto pos = posService.findByName(name);
+        assertEquals(expectedDescription, pos.getDescription());
     }
 
     // TODO: Add Then step for new scenario
